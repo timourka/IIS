@@ -1,0 +1,67 @@
+#VRML_SIM R2025a utf8
+WorldInfo { basicTimeStep 16 }
+Viewpoint { orientation 0 0 1 -1.57079632679 position 0.39 0 1.18 }
+Background { skyColor [ 0.78 0.84 0.91 ] }
+DirectionalLight { direction -0.35 -0.3 -1 intensity 2 }
+DEF TABLE Solid {
+  translation 0.40 0 -0.025
+  children [ Shape { appearance PBRAppearance { baseColor 0.52 0.55 0.58 roughness 1 metalness 0 } geometry Box { size 0.88 0.86 0.05 } } ]
+  boundingObject Box { size 0.88 0.86 0.05 }
+}
+DEF GOAL Pose {
+  translation 0.44 -0.20 0.0006
+  children [ Shape { appearance PBRAppearance { baseColor 0.015 0.75 0.04 roughness 1 metalness 0 } geometry Box { size 0.09 0.09 0.001 } } ]
+}
+DEF CUBE Solid {
+  translation 0.39 0.19 0.0255
+  children [ Shape { appearance PBRAppearance { baseColor 0.83 0.015 0.025 roughness 1 metalness 0 } geometry Box { size 0.05 0.05 0.05 } } ]
+  boundingObject Box { size 0.05 0.05 0.05 }
+  physics Physics { density -1 mass 0.04 }
+}
+Robot {
+  name "1CamPicker XYZ"
+  controller "picker"
+  children [
+    Pose { translation 0.41 0 0.68 children [ Shape { appearance PBRAppearance { baseColor 0.19 0.22 0.26 metalness 0 } geometry Box { size 0.80 0.08 0.035 } } ] }
+    SliderJoint {
+      jointParameters JointParameters { axis 1 0 0 }
+      device [ LinearMotor { name "x" maxVelocity 0.7 maxForce 900 minPosition 0.05 maxPosition 0.75 } PositionSensor { name "sx" } ]
+      endPoint Solid {
+        children [
+          Pose { translation 0 0 0.63 children [ Shape { appearance PBRAppearance { baseColor 0.19 0.22 0.26 metalness 0 } geometry Box { size 0.036 0.75 0.035 } } ] }
+          SliderJoint {
+            jointParameters JointParameters { axis 0 1 0 }
+            device [ LinearMotor { name "y" maxVelocity 0.7 maxForce 900 minPosition -0.36 maxPosition 0.36 } PositionSensor { name "sy" } ]
+            endPoint Solid {
+              children [
+                SliderJoint {
+                  jointParameters JointParameters { axis 0 0 1 }
+                  device [ LinearMotor { name "z" maxVelocity 0.6 maxForce 900 minPosition 0.049 maxPosition 0.52 } PositionSensor { name "sz" } ]
+                  endPoint Solid {
+                    children [
+                      Pose { translation 0 0 0.205 children [ Shape { appearance PBRAppearance { baseColor 0.26 0.29 0.35 metalness 0 } geometry Box { size 0.025 0.025 0.38 } } ] }
+                      Camera { name "rgb" translation 0.09 0 0.12 rotation 0 1 0 1.57079632679 width 320 height 240 fieldOfView 1.45 }
+                      VacuumGripper {
+                        translation 0 0 0.009
+                        name "cup"
+                        contactPoints 1
+                        tensileStrength -1
+                        shearStrength -1
+                        children [ Shape { appearance PBRAppearance { baseColor 0.09 0.09 0.1 metalness 0 } geometry Box { size 0.028 0.028 0.018 } } ]
+                        boundingObject Box { size 0.028 0.028 0.018 }
+                      }
+                    ]
+                    physics Physics { density -1 mass 0.4 centerOfMass [ 0 0 0.16 ] inertiaMatrix [ 0.007 0.007 0.001, 0 0 0 ] }
+                  }
+                }
+              ]
+              physics Physics { density -1 mass 0.6 centerOfMass [ 0 0 0.63 ] inertiaMatrix [ 0.01 0.01 0.01, 0 0 0 ] }
+            }
+          }
+        ]
+        physics Physics { density -1 mass 1 centerOfMass [ 0 0 0.63 ] inertiaMatrix [ 0.05 0.01 0.05, 0 0 0 ] }
+      }
+    }
+  ]
+}
+Robot { name "Lab 5 verifier" controller "verifier" supervisor TRUE }
